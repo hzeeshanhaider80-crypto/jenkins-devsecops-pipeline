@@ -1,0 +1,45 @@
+# The app's 3 containers. Jenkins sets WEB_IMAGE to the image built by the pipeline.
+name: docker-webapp
+
+services:
+  web:                                   # Flask app
+    image: ${WEB_IMAGE:-docker-webapp:local}
+    build: ./app
+    restart: unless-stopped
+    environment:
+      REDIS_HOST: redis
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks: [backend]                  # no public port: only Nginx can reach it
+
+  redis:                                 # database for the visit counter
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data                 # data survives restarts
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks: [backend]
+
+  nginx:                                 # reverse proxy: the only public container
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      web:
+        condition: service_healthy
+    networks: [backend]
+
+volumes:
+  redis-data:
+
+networks:
+  backend:

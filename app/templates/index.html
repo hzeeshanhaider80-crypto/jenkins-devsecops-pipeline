@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dockerized Web App</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 60px auto; padding: 0 16px; color: #1f2937; }
+    h1 { color: #0f766e; }
+    .box { background: #f3f4f6; padding: 16px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>🐳 Dockerized Web App</h1>
+  <p>Flask + Redis + Nginx, deployed by a GitHub Actions CI/CD pipeline.</p>
+  <div class="box">
+    <p><b>Visits:</b> {{ visits if visits is not none else "Redis unavailable" }}</p>
+    <p><b>Version:</b> {{ version }}</p>
+    <p><b>Served by container:</b> {{ container }}</p>
+  </div>
+</body>
+</html>
